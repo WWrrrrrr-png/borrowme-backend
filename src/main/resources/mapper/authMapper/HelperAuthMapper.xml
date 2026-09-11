@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.borrowme.auth.HelperAuthMapper">
+
+    <select id="findByEmail" resultType="com.borrowme.auth.dto.HelperDto">
+        SELECT id, email, password, name, gender, phone, status, created_at
+        FROM helper
+        WHERE email = #{email}
+    </select>
+
+    <select id="findById" resultType="com.borrowme.auth.dto.HelperDto">
+        SELECT id, email, password, name, gender, phone, status, created_at
+        FROM helper
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.borrowme.auth.dto.HelperDto">
+        INSERT INTO helper (email, password, name, gender, phone, status)
+        VALUES (#{email}, #{password}, #{name}, #{gender}, #{phone}, 'ACTIVE')
+    </insert>
+
+    <update id="anonymizeById">
+        UPDATE helper
+        SET email = #{email},
+            password = #{password},
+            name = '탈퇴한 헬퍼',
+            status = 'WITHDRAWN'
+        WHERE id = #{id}
+    </update>
+
+</mapper>

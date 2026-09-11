@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.borrowme.matching.MatchingMapper">
+
+<select id="findById" resultType="com.borrowme.matching.dto.MatchingDto">
+        SELECT id, request_id, helper_id, status, created_at
+        FROM matching
+        WHERE id = #{id}
+    </select>
+   
+   
+<select id="findByHelperId" resultType="com.borrowme.matching.dto.MatchingDto">
+    SELECT m.id, m.request_id, m.helper_id, m.status, m.created_at,
+           r.title AS request_title
+    FROM matching m
+    JOIN user_request r ON m.request_id = r.id
+    WHERE m.helper_id = #{helperId}
+    ORDER BY m.created_at DESC
+</select>
+
+    <update id="updateStatus">
+        UPDATE matching
+        SET status = #{status}
+        WHERE id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.borrowme.admin.AdminMapper">
+
+	<select id="findAllUsers" resultType="com.borrowme.admin.dto.AdminUserDto">
+		SELECT id, email, name, status, created_at
+		FROM user
+		ORDER BY created_at DESC
+	</select>
+	
+	<select id="findUserById" resultType="com.borrowme.admin.dto.AdminUserDto">
+		SELECT id, email, name, status, created_at
+		FROM user
+		WHERE id = #{id}
+	</select>
+	
+	<update id="updateUserStatus">
+		UPDATE user
+		SET status = #{status}
+		WHERE id = #{id}
+	</update>
+	
+	<select id="findAllHelpers" resultType="com.borrowme.admin.dto.AdminHelperDto">
+	    SELECT id, email, name, status, created_at
+	    FROM helper
+	    ORDER BY created_at DESC
+	</select>
+	
+	
+	<select id="findRequestByStatus" resultType="com.borrowme.admin.dto.AdminRequestDto">
+	    SELECT id, user_id, title, content, amount, status, admin_comment, created_at
+	    FROM user_request
+	    WHERE status = #{status}
+	    ORDER BY created_at ASC
+	</select>
+	
+	
+	<select id="findRequestById" resultType="com.borrowme.admin.dto.AdminRequestDto">
+	    SELECT id, user_id, title, content, amount, status, admin_comment, created_at
+	    FROM user_request
+	    WHERE id = #{id}
+	</select>
+	
+	<update id="updateRequestStatus">
+	    UPDATE user_request
+	    SET status = #{status},
+	        admin_comment = #{adminComment}
+	    WHERE id = #{id}
+	</update>
+	
+	<insert id="insertAdminLog" parameterType="com.borrowme.admin.dto.AdminLogDto">
+	    INSERT INTO admin_log (admin_id, target_request_id, action, reason)
+	    VALUES (#{adminId}, #{targetRequestId}, #{action}, #{reason})
+	</insert>
+	
+	<select id="findAllMatchingsForMonitor" resultType="com.borrowme.admin.dto.AdminMatchingViewDto">
+	    SELECT
+	        m.id AS matching_id,
+	        ur.title AS request_title,
+	        h.name AS helper_name,
+	        m.status AS matching_status,
+	        m.created_at AS created_at
+	    FROM matching m
+	    JOIN user_request ur ON m.request_id = ur.id
+	    JOIN helper h ON m.helper_id = h.id
+	    ORDER BY m.created_at DESC
+	</select>
+	
+	
+	<update id="updateAmount">
+	    UPDATE user_request
+	    SET amount = #{amount}
+	    WHERE id = #{id}
+	</update>
+
+</mapper>

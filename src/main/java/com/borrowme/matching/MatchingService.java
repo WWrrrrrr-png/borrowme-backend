@@ -14,54 +14,61 @@ import org.springframework.stereotype.Service;
 @Service
 public class MatchingService {
 
-	private final MatchingMapper matchingMapper;
+        private final MatchingMapper matchingMapper;
 
-	public MatchingService(MatchingMapper matchingMapper) {
-		this.matchingMapper = matchingMapper;
-	}
+        public MatchingService(MatchingMapper matchingMapper) {
+                this.matchingMapper = matchingMapper;
+        }
 
 
-	public MatchingResponse getMatchingDetail(Long matchingId) {
+        public MatchingResponse getMatchingDetail(Long matchingId) {
 
-		MatchingDto dto = matchingMapper.findById(matchingId);
+                MatchingDto dto = matchingMapper.findById(matchingId);
 
-		if (dto == null) {
-			throw new CustomException(ErrorCode.MATCHING_NOT_FOUND);
-		}
+                if (dto == null) {
+                        throw new CustomException(ErrorCode.MATCHING_NOT_FOUND);
+                }
 
-		return MatchingResponse.from(dto);
-	}
+                return MatchingResponse.from(dto);
+        }
 
-	
-	public MatchingResponse updateMatchingStatus(Long matchingId, MatchingStatusUpdateRequest request) {
 
-		MatchingDto dto = matchingMapper.findById(matchingId);
+        public MatchingResponse updateMatchingStatus(Long matchingId, MatchingStatusUpdateRequest request) {
 
-		if (dto == null) {
-			throw new CustomException(ErrorCode.MATCHING_NOT_FOUND);
-		}
+                MatchingDto dto = matchingMapper.findById(matchingId);
 
-		String newStatus = request.getStatus();
+                if (dto == null) {
+                        throw new CustomException(ErrorCode.MATCHING_NOT_FOUND);
+                }
 
-		
-		boolean isValidStatus = "IN_PROGRESS".equals(newStatus) || "COMPLETED".equals(newStatus);
-		if (!isValidStatus) {
-			throw new CustomException(ErrorCode.INVALID_INPUT);
-		}
+                String newStatus = request.getStatus();
 
-		matchingMapper.updateStatus(matchingId, newStatus);
 
-	
-		dto.setStatus(newStatus);
+                boolean isValidStatus = "IN_PROGRESS".equals(newStatus) || "COMPLETED".equals(newStatus);
+                if (!isValidStatus) {
+                        throw new CustomException(ErrorCode.INVALID_INPUT);
+                }
 
-		return MatchingResponse.from(dto);
-	}
+                matchingMapper.updateStatus(matchingId, newStatus);
 
-	
-	public List<MatchingResponse> getMyMatchings(Long helperId) {
-		List<MatchingDto> list = matchingMapper.findByHelperId(helperId);
-		return list.stream()
-				.map(MatchingResponse::from)
-				.collect(Collectors.toList());
-	}
+
+                dto.setStatus(newStatus);
+
+                return MatchingResponse.from(dto);
+        }
+
+
+        public List<MatchingResponse> getMyMatchingsAsHelper(Long helperId) {
+                List<MatchingDto> list = matchingMapper.findByHelperId(helperId);
+                return list.stream()
+                                .map(MatchingResponse::from)
+                                .collect(Collectors.toList());
+        }
+
+        public List<MatchingResponse> getMyMatchingsAsUser(Long userId) {
+                List<MatchingDto> list = matchingMapper.findByUserId(userId);
+                return list.stream()
+                                .map(MatchingResponse::from)
+                                .collect(Collectors.toList());
+        }
 }

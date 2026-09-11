@@ -3,37 +3,37 @@
 
 <mapper namespace="com.borrowme.user.UserRequestMapper">
 
-<!-- 1. 요청 등록 -->
+
 <insert id="insert" parameterType="com.borrowme.user.dto.UserRequestDto" useGeneratedKeys="true" keyProperty="id">
-  
-  
+
+
 INSERT INTO user_request(user_id,title,content,status)
  VALUES (#{userId},#{title},#{content},'PENDING')
-  
-</insert> 
+
+</insert>
 
 <select id="findById"  resultType="com.borrowme.user.dto.UserRequestDto">
-	SELECT id,user_id,title,content,status,admin_comment,created_at
-    FROM user_request 
+	SELECT id,user_id,title,content,amount,status,admin_comment,created_at
+    FROM user_request
     WHERE id = #{id}
 </select>
 
-<!-- 2. 단건 조회  -->
+
 <select id="findByUserId" resultType="com.borrowme.user.dto.UserRequestDto">
-SELECT id,user_id,title,content,status,admin_comment,created_at
-FROM user_request 
-WHERE user_id = #{userId} 
+SELECT id,user_id,title,content,amount,status,admin_comment,created_at
+FROM user_request
+WHERE user_id = #{userId}
 ORDER BY created_at DESC
-</select>  
+</select>
 
 <!--  -->
-<update  id="update" parameterType="com.borrowme.user.dto.UserRequestDto"> 
-  
-  UPDATE user_request 
-  SET title = #{title}, 
-  	  content = #{content}	 
-  	WHERE id = #{id}  
-  
+<update  id="update" parameterType="com.borrowme.user.dto.UserRequestDto">
+
+  UPDATE user_request
+  SET title = #{title},
+  	  content = #{content}
+  	WHERE id = #{id}
+
 </update>
 
 <delete id="deleteById">

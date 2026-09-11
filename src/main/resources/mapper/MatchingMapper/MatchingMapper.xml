@@ -7,14 +7,23 @@
         FROM matching
         WHERE id = #{id}
     </select>
-   
-   
+
+
 <select id="findByHelperId" resultType="com.borrowme.matching.dto.MatchingDto">
     SELECT m.id, m.request_id, m.helper_id, m.status, m.created_at,
            r.title AS request_title
     FROM matching m
     JOIN user_request r ON m.request_id = r.id
     WHERE m.helper_id = #{helperId}
+    ORDER BY m.created_at DESC
+</select>
+
+<select id="findByUserId" resultType="com.borrowme.matching.dto.MatchingDto">
+    SELECT m.id, m.request_id, m.helper_id, m.status, m.created_at,
+           r.title AS request_title
+    FROM matching m
+    JOIN user_request r ON m.request_id = r.id
+    WHERE r.user_id = #{userId}
     ORDER BY m.created_at DESC
 </select>
 

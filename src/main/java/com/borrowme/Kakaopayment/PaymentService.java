@@ -17,11 +17,13 @@ import com.borrowme.Kakaopayment.response.PaymentReadyResponse;
 import com.borrowme.Kakaopayment.response.PaymentResponse;
 import com.borrowme.common.CustomException;
 import com.borrowme.common.ErrorCode;
+import com.borrowme.matching.MatchingMapper;
 
 @Service
 public class PaymentService {
 
     private final PaymentMapper paymentMapper;
+    private final MatchingMapper matchingMapper;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Value("${kakaopay.readUrl}")
@@ -45,8 +47,9 @@ public class PaymentService {
     @Value("${kakaopay.fail}")
     private String failUrl;
 
-    public PaymentService(PaymentMapper paymentMapper) {
+    public PaymentService(PaymentMapper paymentMapper, MatchingMapper matchingMapper) {
         this.paymentMapper = paymentMapper;
+        this.matchingMapper = matchingMapper;
     }
 
     public PaymentReadyResponse readyPayment(Long userId, PaymentReadyRequest request) {
@@ -56,11 +59,10 @@ public class PaymentService {
             throw new CustomException(ErrorCode.MATCHING_NOT_FOUND);
         }
 
-      
         if (matchingDto.getAmount() == null) {
             throw new CustomException(ErrorCode.AMOUNT_NOT_SET);
         }
-        Integer amount = matchingDto.getAmount(); 
+        Integer amount = matchingDto.getAmount();
 
         PaymentDto paymentDto = new PaymentDto();
         paymentDto.setMatchingId(request.getMatchingId());
@@ -91,6 +93,8 @@ public class PaymentService {
             ResponseEntity<Map> responseEntity = restTemplate.postForEntity(readUrl, httpEntity, Map.class);
             response = responseEntity.getBody();
         } catch (Exception e) {
+            System.out.println("=== 카카오페이 ready 요청 실패 상세 원인 ===");
+            e.printStackTrace();
             throw new CustomException(ErrorCode.PAYMENT_FAILED);
         }
 
@@ -113,6 +117,11 @@ public class PaymentService {
             throw new CustomException(ErrorCode.PAYMENT_NOT_FOUND);
         }
 
+       
+        if ("SUCCESS".equals(paymentDto.getPaymentStatus())) {
+            return PaymentResponse.from(paymentDto);
+        }
+
         Map<String, Object> body = new HashMap<>();
         body.put("cid", cid);
         body.put("tid", paymentDto.getPaymentKey());
@@ -130,6 +139,8 @@ public class PaymentService {
         try {
             responseEntity = restTemplate.postForEntity(approveUrl, httpEntity, Map.class);
         } catch (Exception e) {
+            System.out.println("=== 카카오페이 approve 요청 실패 상세 원인 ===");
+            e.printStackTrace();
             throw new CustomException(ErrorCode.PAYMENT_FAILED);
         }
 
@@ -139,6 +150,9 @@ public class PaymentService {
 
         paymentMapper.updateStatus(paymentId, "SUCCESS");
         paymentDto.setPaymentStatus("SUCCESS");
+
+     
+        matchingMapper.updateStatus(paymentDto.getMatchingId(), "COMPLETED");
 
         return PaymentResponse.from(paymentDto);
     }

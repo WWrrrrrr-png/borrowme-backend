@@ -8,10 +8,11 @@ import com.borrowme.matching.dto.MatchingDto;
 
 public interface MatchingMapper {
 
-
     MatchingDto findById(@Param("id") Long id);
-   
-    void updateStatus(@Param("id") Long id, @Param("status") String status); 
-	
+
+    void updateStatus(@Param("id") Long id, @Param("status") String status);
+
     List<MatchingDto> findByHelperId(@Param("helperId") Long helperId);
+
+    List<MatchingDto> findByUserId(@Param("userId") Long userId);
 }

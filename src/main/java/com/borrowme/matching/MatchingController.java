@@ -19,14 +19,21 @@ public class MatchingController {
     public MatchingController(MatchingService matchingService) {
         this.matchingService = matchingService;
     }
-    	
-    @GetMapping("/my")   // 반드시 /{id}보다 먼저 선언
+
+    @GetMapping("/my")   
     public ApiResponse<?> getMyMatchings(HttpServletRequest httpRequest) {
-        Long helperId = (Long) httpRequest.getAttribute("memberId");
-        List<MatchingResponse> response = matchingService.getMyMatchings(helperId);
+        Long memberId = (Long) httpRequest.getAttribute("memberId");
+        String role = (String) httpRequest.getAttribute("memberRole");
+
+        List<MatchingResponse> response;
+        if ("HELPER".equals(role)) {
+            response = matchingService.getMyMatchingsAsHelper(memberId);
+        } else {
+            response = matchingService.getMyMatchingsAsUser(memberId);
+        }
         return ApiResponse.success(response);
     }
-    
+
     @GetMapping("/{id}")
     public ApiResponse<?> getMatchingDetail(@PathVariable Long id) {
         MatchingResponse response = matchingService.getMatchingDetail(id);
@@ -38,8 +45,6 @@ public class MatchingController {
                                                 @RequestBody MatchingStatusUpdateRequest request) {
         MatchingResponse response = matchingService.updateMatchingStatus(id, request);
         return ApiResponse.success(response);
-    }  
-    
-	
+    }
 
 }

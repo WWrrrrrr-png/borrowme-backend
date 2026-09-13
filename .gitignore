@@ -36,5 +36,4 @@ build/
 application-private.properties 
 application-real.properties  
 kakaopay.properties 
-email.properties
 .metadata/
